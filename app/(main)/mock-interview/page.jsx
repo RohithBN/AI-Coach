@@ -1,11 +1,14 @@
 import Agent from '@/components/Agent'
+import { checkUser } from '@/lib/checkUser';
 import React from 'react'
 
-const MockInterview = () => {
-  return (
-    <div className='flex flex-row gap-6'>
+const MockInterview = async() => {
+  const user=await checkUser();
+  if (!user) return <div>Not signed in</div>
 
-      <Agent username={"Rohith"} userId="user123" type="generate"/>
+  return (
+    <div className=''>
+      <Agent username={user?.name} userId={user?.id} type="generate"/>
       
     </div>
   )

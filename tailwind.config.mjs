@@ -56,6 +56,10 @@ export default {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		keyframes: {
+			'fadeIn': {
+				'0%': { opacity: '0' },
+				'100%': { opacity: '1' },
+			  },
   			'accordion-down': {
   				from: {
   					height: '0'
@@ -77,6 +81,8 @@ export default {
   			'accordion-down': 'accordion-down 0.2s ease-out',
   			'accordion-up': 'accordion-up 0.2s ease-out',
 			'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+			'fadeIn': 'fadeIn 0.5s ease-in-out',
+			'ping': 'ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
 			
   		}
   	}
