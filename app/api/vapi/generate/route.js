@@ -13,6 +13,12 @@ export async function GET(){
 export async function POST(request){
 try {
     const {role,type,level,techstack,amount,userid} = await request.json()
+    if (!role || !type || !level || !techstack || !amount || !userid) {
+        return Response.json({
+          success: false,
+          message: "Missing required fields",
+        }, { status: 400 });
+      }
     const {text:questions}=await generateText({
         model:google('gemini-2.0-flash-001'),
         prompt:`Prepare questions for a job interview.
@@ -38,21 +44,29 @@ try {
         finalized:true,
         createdAt:new Date().toISOString()
     }
-    console.log("interview",interview)
-
-    await adminDb.collection('interviews').add(interview)
-    
+    try {
+        const docRef = await adminDb.collection('interviews').add(interview);
+        
         return Response.json({
-            success:true,
-            message:"POST request to /api/vapi/generate/route",
-            params:{role,type,level,techstack,amount,userid}
-        })
-} catch (error) {
-    return Response.json({
-        success:false,
-        message:"POST request to /api/vapi/generate/route",
-        error:error.message
-    })
-    
-}
-}
+          success: true,
+          message: "Interview created successfully",
+          interviewId: docRef.id,
+          params: { role, type, level, techstack, amount, userid }
+        });
+      } catch (dbError) {
+        console.error("Firebase Error:", dbError);
+        return Response.json({
+          success: false,
+          message: "Database operation failed",
+          error: dbError.message
+        }, { status: 500 });
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      return Response.json({
+        success: false,
+        message: "API request failed",
+        error: error.message
+      }, { status: 500 });
+    }
+  }
