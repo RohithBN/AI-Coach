@@ -22,8 +22,10 @@ import { toast } from "sonner";
 import useFetch from "@/hooks/use-fetch";
 
 const formatDisplayDate = (dateString) => {
+  console.log(dateString,"dateString")
   if (!dateString) return "";
   const date = parse(dateString, "yyyy-MM", new Date());
+  console.log(date,"date")
   return format(date, "MMM yyyy");
 };
 
@@ -166,11 +168,13 @@ export function EntryForm({ type, entries, onChange }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+              <label htmlFor="startDate">Start Date (yyyy-mm)</label>
                 <Input
                   type="month"
                   {...register("startDate")}
                   error={errors.startDate}
                 />
+               
                 {errors.startDate && (
                   <p className="text-sm text-red-500">
                     {errors.startDate.message}
@@ -178,12 +182,14 @@ export function EntryForm({ type, entries, onChange }) {
                 )}
               </div>
               <div className="space-y-2">
+              <label htmlFor="endDate">End Date (yyyy-mm)</label>
                 <Input
                   type="month"
                   {...register("endDate")}
                   disabled={current}
                   error={errors.endDate}
                 />
+                
                 {errors.endDate && (
                   <p className="text-sm text-red-500">
                     {errors.endDate.message}
