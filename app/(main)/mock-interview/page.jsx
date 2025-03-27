@@ -8,8 +8,7 @@ const MockInterview = async() => {
 
   return (
     <div className=''>
-      <Agent username={user?.name} userId={user?.id} type="generate"/>
-      
+      <Agent username={user?.name} userId={user?.clerkUserId} type="generate"/>
     </div>
   )
 }

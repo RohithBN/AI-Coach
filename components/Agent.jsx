@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { cn } from '@/lib/utils'
+import { interviewer } from '@/app/lib/constants';
 
 const CallStatus = {
     INACTIVE: 'INACTIVE',
@@ -45,7 +46,7 @@ MessageDisplay.propTypes = {
     content: PropTypes.string
 }
 
-const Agent = ({username, userId, type}) => {
+const Agent = ({username, userId, type,interviewId,questions}) => {
     const router = useRouter();
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [callStatus, setCallStatus] = useState(CallStatus.INACTIVE);
@@ -96,11 +97,62 @@ const Agent = ({username, userId, type}) => {
             vapi.off("error", onError);
         }
     }, []);
-
+    const handleGenerateFeedback = async(messages) => {
+        if (!messages?.length || !interviewId || !userId) {
+            console.error("Missing required fields:", { messages, interviewId, userId });
+            return;
+        }
+    
+        console.log("Generating feedback for interview:", interviewId);
+        
+        try {
+            setIsLoading(true);
+            
+            const response = await fetch('/api/generate-feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: messages.map(m => ({
+                        role: m.role,
+                        content: m.content
+                    })),
+                    interviewId,
+                    userId
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            
+            if (data.success && data.id) {
+                router.push(`/interview-id/${interviewId}/feedback`);
+            } else {
+                throw new Error(data.error || 'Failed to generate feedback');
+            }
+        } catch (error) {
+            console.error("Failed to generate feedback:", error);
+            // TODO: Add toast notification here
+        } finally {
+            setIsLoading(false);
+        }
+    }
     useEffect(() => {
         if(callStatus === CallStatus.FINISHED) {
+            if(type=='generate'){
+                router.push('/interviews')
+            }else{
+                handleGenerateFeedback(messages)
+            }
+        }
+        if(callStatus === CallStatus.FINISHED) {
             const timeout = setTimeout(() => {
-                router.push('/');
+                router.push('/interviews');
             }, 1000);
             return () => clearTimeout(timeout);
         }
@@ -110,12 +162,26 @@ const Agent = ({username, userId, type}) => {
         setIsLoading(true);
         setCallStatus(CallStatus.CONNECTING);
         try {
+            if(type=='generate'){
             await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
                 variableValues: {
                     username,
                     userid: userId,
                 }
             });
+        }else{
+            let formattedQuestions=''
+            if(questions){
+                formattedQuestions=questions.map((question)=>`${question}`).join('\n')
+                console.log("Formatted questions:",formattedQuestions)
+            }
+            await vapi.start(interviewer,{
+                variableValues:{
+                    username,
+                    questions:formattedQuestions
+                }
+            })
+        }
         } catch (error) {
             console.error('Failed to start call:', error);
             setCallStatus(CallStatus.INACTIVE);
@@ -141,7 +207,7 @@ const Agent = ({username, userId, type}) => {
             <div className="flex flex-col sm:flex-row gap-10 items-center justify-between w-full">
                 {/* AI Interviewer Card */}
                 <div className="flex flex-col items-center h-96 gap-2 p-4 w-full sm:w-1/2 bg-gray-400/10 rounded-lg border border-blue-200/50 backdrop-blur-sm">
-                    <div className="relative flex items-center justify-center rounded-full w-32 h-32">
+                    <div className="relative flex  mt-16 items-center justify-center rounded-full w-32 h-32">
                         <Image
                             src="/ai-avatar.png"
                             alt="AI Interviewer"
