@@ -4,15 +4,15 @@ import Agent from '@/components/Agent'
 import { checkUser } from '@/lib/checkUser'
 
 const InterviewDetailsPage = async ({ params }) => {
-  const parameters = await params
-  const interview = await getInterviewById(parameters.id)
+  const parameters = await params;
+  const interview = await getInterviewById(parameters?.id)
   const user = await checkUser();
 
   if (!interview) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <p className="text-xl text-white/80">Interview not found</p>
-      </div>
+        </div>
     )
   }
 
