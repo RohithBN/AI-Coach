@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { checkUser } from "@/lib/checkUser";
+import Image from "next/image";
 
 export default async function Header() {
   await checkUser();
@@ -26,13 +27,27 @@ export default async function Header() {
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/">
-          <h1 className="text-40 font-bold">Opus AI</h1>
-        </Link>
+      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2 mt-1">
+        <Image src="/icon.png" alt="Opus AI" width={75} height={75} />
+      </Link>
+    </div>
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <SignedIn>
+          <Link href="/mock-interview">
+          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+            <User className="h-4 w-4" />
+            Mock Interview
+          </Button>
+        </Link>
+          <Link href="/interviews">
+          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+            <User className="h-4 w-4" />
+            My Interviews
+          </Button>
+        </Link>
             <Link href="/dashboard">
               <Button
                 variant="outline"
