@@ -7,6 +7,8 @@ import {
   GraduationCap,
   ChevronDown,
   StarsIcon,
+  User,
+  FileUser
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -16,7 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 import { checkUser } from "@/lib/checkUser";
 
 export default async function Header() {
@@ -73,13 +74,19 @@ export default async function Header() {
                 <DropdownMenuItem asChild>
                   <Link href="/interview" className="flex items-center gap-2">
                     <GraduationCap className="h-4 w-4" />
-                    Interview Quiz
+                    Role Quiz
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/mock-interview" className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4" />
+                    <User className="h-4 w-4" />
                     Mock Interview
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/interviews" className="flex items-center gap-2">
+                    <FileUser className="h-4 w-4" />
+                    Your Interviews
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
