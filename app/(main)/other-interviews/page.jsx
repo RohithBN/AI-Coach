@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getInterviews } from "@/app/lib/actions/firebase.actions";
+import { getLatestInterviews } from "@/app/lib/actions/firebase.actions";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Calendar, Layers, ArrowRight, Award } from "lucide-react";
+import { Calendar, Layers, ArrowRight, Award, ArrowLeft } from "lucide-react";
 
 const Page = () => {
   const [interviews, setInterviews] = useState([]);
@@ -23,7 +23,7 @@ const Page = () => {
       }
 
       try {
-        const data = await getInterviews(user.id);
+        const data = await getLatestInterviews(user.id);
         console.log(data)
         setInterviews(data);
       } catch (error) {
@@ -48,7 +48,7 @@ const Page = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-white/80 text-xl font-medium bg-white/5 backdrop-blur-md p-8 rounded-xl border border-white/10 shadow-xl">
-          Please sign in to view your interviews
+          Please sign in to view others interviews
         </div>
       </div>
     );
@@ -61,16 +61,16 @@ const Page = () => {
         <div className="flex justify-between items-start mb-8">
   <div>
     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 tracking-tight">
-      Your Interviews
+      Other Interviews
     </h1>
     <p className="mt-3 text-gray-400 max-w-2xl">
-      Review your scheduled and completed interviews. Prepare and improve with each session.
+      Take up Interviews prepared by other users!. Prepare and improve with each session.
     </p>
   </div>
-  <Link href={"/other-interviews"}>
+  <Link href={"/interviews"}>
     <Button className="bg-white/10 h-14 hover:bg-white/15 text-white border border-white/10 gap-2 transition-all duration-300">
-      Other Interviews
-      <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+    <ArrowLeft className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
+     My Interviews
     </Button>
   </Link>
 </div>

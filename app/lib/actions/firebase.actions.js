@@ -94,3 +94,22 @@ export async function getFeedbackById(id) {
       }
     
 }
+
+
+export async function getLatestInterviews(userId){
+    if(!userId){
+        console.error("getLatestInterviews: User ID is required but received",userId)
+        throw new Error("User ID is required")
+    }
+   
+    const limit=20;
+    const interviews = await adminDb
+      .collection("interviews")
+      .where("userId", "!=", userId)
+      .get();
+  
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }))
+  }
