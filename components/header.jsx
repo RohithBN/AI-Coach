@@ -89,6 +89,12 @@ export default async function Header() {
                     Your Interviews
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/resume-based-interview" className="flex items-center gap-2">
+                    <FileUser className="h-4 w-4" />
+                    Resume-based Interview
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SignedIn>
