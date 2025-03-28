@@ -106,10 +106,21 @@ const Page = () => {
           
               {/* Details */}
               <div className="space-y-4 flex-grow">
-                <div className="flex items-center gap-2">
-                  <Award className="h-4 w-4 text-white/70" />
-                  <span className="text-sm text-white/70">Level: </span>
-                  <span className="text-sm text-white">{interview.level.replace(/\b\w/g, char => char.toUpperCase())}</span>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Award className="h-4 w-4 text-white/70" />
+                    <span className="text-sm text-white/70">Level: </span>
+                    <span className="text-sm text-white">
+                      {interview.level.replace(/\b\w/g, char => char.toUpperCase())}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Layers className="h-4 w-4 text-white/70" />
+                    <span className="text-sm text-white/70">No of Questions: </span>
+                    <span className="text-sm text-white">
+                      {interview?.questionSize || 0}
+                    </span>
+                  </div>
                 </div>
               </div>
               

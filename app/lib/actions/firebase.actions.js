@@ -28,6 +28,7 @@ export const getInterviews = async (userId) => {
           type: data.type || "Unknown",
           level: data.level || "Unknown",
           techstack: Array.isArray(data.techstack) ? data.techstack : [],
+          questionSize: Array.isArray(data.questions) ? data.questions.length : 0,
         };
       })
       .sort((a, b) => b.createdAt - a.createdAt); // Sort manually
@@ -71,28 +72,54 @@ export async function saveFeedback({feedback,interviewId,createdAt,userId}){
 export async function getFeedbackById(id) {
     try {
         const feedbackSnapshot = await adminDb
-          .collection("feedback")
-          .where("interviewId", "==", id)
-          .get();
+            .collection("feedback")
+            .where("interviewId", "==", id)
+            .get();
     
         if (feedbackSnapshot.empty) {
-          console.log("No feedback found for interview:", id);
-          return [];
+            console.log("No feedback found for interview:", id);
+            return [];
         }
     
         return feedbackSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            feedback: data.feedback || "No feedback provided",
-            createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
-          };
+            const data = doc.data();
+            return {
+                id: doc.id,
+                summary: data.feedback?.summary || "No summary available",
+                technical: {
+                    rating: Number(data.feedback?.technical?.rating) || 0,
+                    strengths: Array.isArray(data.feedback?.technical?.strengths) 
+                        ? data.feedback.technical.strengths 
+                        : [],
+                    improvements: Array.isArray(data.feedback?.technical?.improvements) 
+                        ? data.feedback.technical.improvements 
+                        : []
+                },
+                communication: {
+                    rating: Number(data.feedback?.communication?.rating) || 0,
+                    strengths: Array.isArray(data.feedback?.communication?.strengths) 
+                        ? data.feedback.communication.strengths 
+                        : [],
+                    improvements: Array.isArray(data.feedback?.communication?.improvements) 
+                        ? data.feedback.communication.improvements 
+                        : []
+                },
+                overall: {
+                    score: Number(data.feedback?.overall?.score) || 0,
+                    recommendations: Array.isArray(data.feedback?.overall?.recommendations) 
+                        ? data.feedback.overall.recommendations 
+                        : []
+                },
+                createdAt: data.createdAt ? new Date(data.createdAt) : new Date(),
+                interviewId: data.interviewId,
+                userId: data.userId
+            };
         });
-      } catch (error) {
+        
+    } catch (error) {
         console.error("Error fetching feedback:", error);
         throw new Error("Failed to fetch feedback");
-      }
-    
+    }
 }
 
 
@@ -111,5 +138,8 @@ export async function getLatestInterviews(userId){
     return interviews.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      questionSize: Array.isArray(doc.data().questions)
+        ? doc.data().questions.length
+        : 0,
     }))
   }

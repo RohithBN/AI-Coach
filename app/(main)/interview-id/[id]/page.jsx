@@ -51,6 +51,7 @@ const InterviewDetailsPage = async ({ params }) => {
             username={user?.name}
             interviewId={parameters.id}
             questions={interview.questions}
+            userId={user?.id}
           />
         </div>
       </div>

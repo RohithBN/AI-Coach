@@ -104,8 +104,6 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
             return;
         }
     
-        console.log("Generating feedback for interview:", interviewId);
-        
         try {
             setIsLoading(true);
             
@@ -142,22 +140,24 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
         } finally {
             setIsLoading(false);
         }
-    }
+    };
     useEffect(() => {
-        if(callStatus === CallStatus.FINISHED) {
-            if(type=='generate'){
-                router.push('/interviews')
-            }else{
-                handleGenerateFeedback(messages)
+        if (callStatus === CallStatus.FINISHED) {
+          if (type === 'generate') {
+            router.push('/interviews');
+          } else if (messages.length > 0) {
+            // Only call handleGenerateFeedback if we have the required data
+            if (userId && interviewId) {
+              handleGenerateFeedback(messages);
+            } else {
+              console.error("Missing userId or interviewId for feedback generation", {
+                userId,
+                interviewId
+              });
             }
+          }
         }
-        if(callStatus === CallStatus.FINISHED) {
-            const timeout = setTimeout(() => {
-                router.push('/interviews');
-            }, 1000);
-            return () => clearTimeout(timeout);
-        }
-    }, [callStatus, router]);
+      }, [callStatus, type, messages, userId, interviewId, router]);
 
     const handleCall = async () => {
         setIsLoading(true);
@@ -374,7 +374,9 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
 Agent.propTypes = {
     username: PropTypes.string.isRequired,
     userId: PropTypes.string.isRequired,
-    type: PropTypes.string
-}
+    type: PropTypes.string.isRequired,
+    interviewId: PropTypes.string.isRequired,
+    questions: PropTypes.arrayOf(PropTypes.string)
+  };
 
-export default Agent
+export default Agent;
