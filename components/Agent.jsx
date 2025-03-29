@@ -48,6 +48,35 @@ MessageDisplay.propTypes = {
 }
 
 const Agent = ({username, userId, type,interviewId,questions}) => {
+    const ErrorType = {
+        MEETING_ENDED: 'MEETING_ENDED',
+        CONNECTION_ERROR: 'CONNECTION_ERROR',
+        UNKNOWN_ERROR: 'UNKNOWN_ERROR'
+      };
+      
+      // Add this state in the Agent component
+      const [error, setError] = useState(null);
+      const [reconnectAttempts, setReconnectAttempts] = useState(0);
+      const MAX_RECONNECT_ATTEMPTS = 3;
+      
+      // Add this function inside the Agent component
+      const handleReconnect = async () => {
+        if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+          setError({
+            type: ErrorType.CONNECTION_ERROR,
+            message: 'Failed to reconnect after multiple attempts'
+          });
+          setCallStatus(CallStatus.INACTIVE);
+          return;
+        }
+      
+        try {
+          setReconnectAttempts(prev => prev + 1);
+          await handleCall();
+        } catch (error) {
+          console.error('Reconnection attempt failed:', error);
+        }
+      };
     const router = useRouter();
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [callStatus, setCallStatus] = useState(CallStatus.INACTIVE);
@@ -70,17 +99,35 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
                 }
                 setMessages((prev) => [...prev, newMessage]);
             }
-        }
-        const onSpeakingStart = () => {
-            setIsSpeaking(true);
-        }
+        };
+            const onSpeakingStart = () => {
+                setIsSpeaking(true);
+            }
         const onSpeakingEnd = () => {
             setIsSpeaking(false);
         }
         const onError = (error) => {
             console.error('VAPI Error:', error);
+            
+            if (error?.message?.includes('Meeting has ended')) {
+              setError({
+                type: ErrorType.MEETING_ENDED,
+                message: 'Meeting ended unexpectedly'
+              });
+              
+              // Only attempt to reconnect if the call was active
+              if (callStatus === CallStatus.ACTIVE) {
+                handleReconnect();
+              }
+            } else {
+              setError({
+                type: ErrorType.UNKNOWN_ERROR,
+                message: error?.message || 'An unexpected error occurred'
+              });
+            }
+            
             setCallStatus(CallStatus.INACTIVE);
-        }
+          };
 
         vapi.on("call-start", onCallStart);
         vapi.on("call-end", onCallEnd);
@@ -97,7 +144,7 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
             vapi.off("speaking-end", onSpeakingEnd);
             vapi.off("error", onError);
         }
-    }, []);
+        },[]);
     const handleGenerateFeedback = async(messages) => {
         if (!messages?.length || !interviewId || !userId) {
             console.error("Missing required fields:", { messages, interviewId, userId });
@@ -159,37 +206,54 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
         }
       }, [callStatus, type, messages, userId, interviewId, router]);
 
-    const handleCall = async () => {
-        setIsLoading(true);
-        setCallStatus(CallStatus.CONNECTING);
-        try {
-            if(type=='generate'){
-            await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
-                variableValues: {
-                    username,
-                    userid: userId,
-                }
-            });
-        }else{
-            let formattedQuestions=''
-            if(questions){
-                formattedQuestions=questions.map((question)=>`${question}`).join('\n')
-                console.log("Formatted questions:",formattedQuestions)
-            }
-            await vapi.start(interviewer,{
-                variableValues:{
-                    username,
-                    questions:formattedQuestions
-                }
-            })
+      // Update the handleCall function
+const handleCall = async () => {
+    setError(null);
+    setIsLoading(true);
+    setCallStatus(CallStatus.CONNECTING);
+    
+    try {
+      if (type === 'generate') {
+        await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID, {
+          variableValues: {
+            username,
+            userid: userId,
+          }
+        });
+      } else {
+        let formattedQuestions = '';
+        if (questions) {
+          formattedQuestions = questions.map((question) => `${question}`).join('\n');
         }
-        } catch (error) {
-            console.error('Failed to start call:', error);
-            setCallStatus(CallStatus.INACTIVE);
-        } finally {
-            setIsLoading(false);
-        }
+        await vapi.start(interviewer, {
+          variableValues: {
+            username,
+            questions: formattedQuestions
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Failed to start call:', error);
+      
+      // Handle specific error cases
+      if (error.status === 400) {
+        setError({
+          type: ErrorType.CONNECTION_ERROR,
+          message: 'Invalid request configuration. Please try again.'
+        });
+      } else {
+        setError({
+          type: ErrorType.CONNECTION_ERROR,
+          message: 'Failed to start interview session. Please try again.'
+        });
+      }
+      
+      setCallStatus(CallStatus.INACTIVE);
+    } finally {
+      setIsLoading(false);
     }
+  };
+      
 
     const handleDisconnect = async () => {
         try {
@@ -205,6 +269,30 @@ const Agent = ({username, userId, type,interviewId,questions}) => {
 
     return (
         <div className="flex flex-col gap-10 w-full max-w-7xl mx-auto p-6 relative">
+            {error && (
+      <div className="w-full flex justify-center mt-4">
+        <div className="px-4 py-2 bg-red-900/20 border border-red-500/20 rounded-full">
+          <p className="text-sm text-red-400 flex items-center gap-2">
+            <svg 
+              className="h-4 w-4" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12" y2="16" />
+            </svg>
+            {error.message}
+            {reconnectAttempts > 0 && (
+              <span className="ml-2">
+                (Attempt {reconnectAttempts}/{MAX_RECONNECT_ATTEMPTS})
+              </span>
+            )}
+          </p>
+        </div>
+      </div>
+    )}
             {/* Background Elements */}
             <div className="fixed inset-0 bg-black/40 -z-10"></div>
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(25,25,25,0.2),transparent_70%)] -z-10"></div>
