@@ -1,14 +1,15 @@
 import React from "react";
 import { Button } from "./ui/button";
-import {
-  PenBox,
+import { 
   LayoutDashboard,
   FileText,
   GraduationCap,
   ChevronDown,
   StarsIcon,
   User,
-  FileUser
+  FileUser,
+  MessageSquare,
+  PenBox 
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -105,9 +106,15 @@ export default async function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/resume-based-interview" className="flex items-center gap-2">
+                  <Link href="/resume-based-interview" className="flex items-center gap-2 tex-sm">
                     <FileUser className="h-4 w-4" />
                     Resume-based Interview
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/find-jobs" className="flex items-center gap-2">
+                    <FileUser className="h-4 w-4" />
+                    Find Jobs
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -115,12 +122,24 @@ export default async function Header() {
           </SignedIn>
 
           <SignedOut>
+            <Link href="/chatbot">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2 mr-2">
+                <MessageSquare className="h-4 w-4" />
+                Chat with Us
+              </Button>
+            </Link>
             <SignInButton>
               <Button variant="outline">Sign In</Button>
             </SignInButton>
           </SignedOut>
 
           <SignedIn>
+            <Link href="/chatbot">
+              <Button variant="ghost" size="sm" className="flex items-center gap-2 mr-2">
+                <MessageSquare className="h-4 w-4" />
+                Chat with Us
+              </Button>
+            </Link>
             <UserButton
               appearance={{
                 elements: {
@@ -132,6 +151,7 @@ export default async function Header() {
               afterSignOutUrl="/"
             />
           </SignedIn>
+
         </div>
       </nav>
     </header>

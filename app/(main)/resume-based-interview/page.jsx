@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Upload, X, Plus, Loader2, Briefcase, Users, Code, List } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const ResumeBasedInterview = () => {
     const { user } = useUser();    

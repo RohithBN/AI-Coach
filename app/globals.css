@@ -82,6 +82,39 @@ body {
   }
 }
 
+/* Add these styles for better markdown formatting */
+/* Add these styles for better markdown formatting */
+.prose-invert {
+  --tw-prose-body: theme('colors.gray.300');
+  --tw-prose-headings: theme('colors.white');
+  --tw-prose-lead: theme('colors.gray.400');
+  --tw-prose-links: theme('colors.white');
+  --tw-prose-bold: theme('colors.white');
+  --tw-prose-counters: theme('colors.gray.400');
+  --tw-prose-bullets: theme('colors.gray.400');
+  --tw-prose-hr: theme('colors.gray.800');
+  --tw-prose-quotes: theme('colors.gray.100');
+  --tw-prose-quote-borders: theme('colors.gray.800');
+  --tw-prose-captions: theme('colors.gray.400');
+  --tw-prose-code: theme('colors.white');
+  --tw-prose-pre-code: theme('colors.gray.300');
+  --tw-prose-pre-bg: theme('colors.black');
+  --tw-prose-th-borders: theme('colors.gray.800');
+  --tw-prose-td-borders: theme('colors.gray.800');
+}
+
+.prose-invert a:hover {
+  opacity: 0.8;
+}
+
+.prose-invert pre {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.prose-invert ul > li::marker {
+  color: theme('colors.gray.400');
+}
+
 .hero-image-wrapper {
   perspective: 1000px;
 }
