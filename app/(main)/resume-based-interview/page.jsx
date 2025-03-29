@@ -9,8 +9,8 @@ const ResumeBasedInterview = () => {
     const router=useRouter();
     const [formData, setFormData] = useState({
         role: '',
-        type: 'technical', // default value
-        level: 'entry', // default value
+        type: 'Technical', // default value
+        level: 'Entry', // default value
         techstack: [],
         amount: 5, // default value
       });

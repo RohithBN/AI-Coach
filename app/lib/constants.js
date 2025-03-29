@@ -9,7 +9,7 @@ export const interviewer = {
     },
     voice: {
       provider: "11labs",
-      voiceId: "sarah",
+      voiceId: "paige",
       stability: 0.4,
       similarityBoost: 0.8,
       speed: 0.9,

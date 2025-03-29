@@ -31,18 +31,41 @@ export async function POST(request) {
             model: google('gemini-2.0-flash-001', {
                 apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY  // Add API key
             }),
-            prompt: `Prepare questions for a job interview based on the resume content provided.
-                The job role is ${role}.
-                The job experience level is ${level}.
-                The tech stack used in the job is: ${techstack}.
-                The focus between behavioural and technical questions should lean towards: ${type}.
-                The amount of questions required is: ${amount}.
-                The resume content is as follows: ${fileContent}.
-                Please return only the questions, without any additional text.
-                The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
-                Return the questions formatted like this:
-                ["Question 1", "Question 2", "Question 3"]
-            `.trim()
+            prompt: `You are an expert technical interviewer. Analyze the provided resume and generate relevant interview questions.
+            Role: ${role}
+            Level: ${level}
+            Tech Stack: ${techstack}
+            Interview Type: ${type}
+            Questions Required: ${amount}
+
+            Resume Content:
+            ${fileContent}
+
+            Instructions:
+            1. Analyze the candidate's experience and skills from their resume
+            2. Generate ${amount} questions that:
+            - Match the job role requirements
+            - Are appropriate for the ${level} experience level
+            - Focus on the specified tech stack: ${techstack}
+            - Maintain a balance with ${type} focus
+            3. Include a mix of:
+            - Technical competency questions based on their listed skills
+            - Experience-based questions from their work history
+            - Problem-solving scenarios relevant to ${role}
+            - Questions that assess cultural fit and soft skills
+
+            Format Rules:
+            - Return a JSON array of strings only
+            - No special characters (/, *, [], {}, etc.)
+            - Keep questions clear and concise
+            - Each question should be complete and self-contained
+
+            Example Format:
+            ["Tell me about your experience with [technology] at [company]",
+            "How would you implement [specific feature] using [technology]",
+            "Describe a challenging project from your resume"]
+
+            Return only the JSON array of questions, no additional text or formatting.`.trim(),
         });
 
         console.log("resume-questions:", questions);  // Fixed typo in console.log
