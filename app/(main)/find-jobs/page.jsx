@@ -230,10 +230,10 @@ const FindJobs = () => {
                 className="border border-white/10 bg-white/[0.02] px-4 rounded-lg mb-4"
               >
                 <AccordionTrigger className="text-left text-white hover:text-gray-400">
-                  {question}
+                  {question.replace(/\*\*/g, '')}
                 </AccordionTrigger>
                 <AccordionContent className="text-white/70 whitespace-pre-line leading-relaxed">
-                  {answer}
+                  {answer.replace(/\*\*/g, '')}
                 </AccordionContent>
               </AccordionItem>
             );
