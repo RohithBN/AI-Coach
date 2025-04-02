@@ -70,10 +70,10 @@ const Page = () => {
       <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8">
         <div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 tracking-tight">
-            Your Interviews
+            Other Interviews
           </h1>
           <p className="mt-3 text-gray-400 max-w-2xl">
-            Review your scheduled and completed interviews. Prepare and improve with each session.
+            Take up interviews created by other Users.
           </p>
         </div>
         
@@ -90,14 +90,14 @@ const Page = () => {
             />
           </div>
 
-          <Link href="/other-interviews">
+          <Link href="/interviews">
             <Button 
               className="group bg-white/5 hover:bg-white/10 text-white border border-white/10 
                        px-6 py-2 rounded-xl flex items-center gap-3 transition-all duration-300
                        hover:border-white/20 hover:shadow-lg hover:shadow-white/5"
             >
               <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              Other Interviews
+              My Interviews
             </Button>
           </Link>
         </div>
