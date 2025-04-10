@@ -6,6 +6,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Calendar, Layers, ArrowRight, Award, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import PerformanceChart from '@/components/PerformanceChart';
+import InterviewStats from '@/components/InterviewStats';
+import { calculateAverageDuration, calculateAverageScore, calculateCompletionRate } from "@/app/lib/helper";
+
 
 const Page = () => {
   const [interviews, setInterviews] = useState([]);
@@ -13,7 +17,33 @@ const Page = () => {
   const { user, isLoaded } = useUser();
   const [filteredInterviews, setFilteredInterviews] = useState([]);
   const [searchVal,setSearchVal]=useState('')
+  const [performanceData,setPerformanceData]=useState([]);
+  const [stats,setStats]=useState({
+    averageScore: 0,
+    averageDuration: '0m',
+    totalInterviews: 0,
+    completionRate: 0,
+  });
+
+  useEffect(()=>{
+    if(!interviews.length) return;
+    const calculatedStats={
+      averageScore: calculateAverageScore(interviews),
+      averageDuration: calculateAverageDuration(interviews),
+      totalInterviews: interviews.length,
+      completionRate: calculateCompletionRate(interviews),
+    }
+    const chartdata=interviews.map((interview)=>({
+      date:interview.createdAt,
+      score:interview.overallScore
+    }));
+
+  setPerformanceData(chartdata);
+  setStats(calculatedStats)
+  },[interviews])
+
   
+
     useEffect(() => {
       const filtered = interviews.filter((interview) =>
         interview.role.toLowerCase().includes(searchVal.toLowerCase())
@@ -103,6 +133,12 @@ const Page = () => {
           </Link>
         </div>
       </div>
+      {/* Stats Section */}
+      <InterviewStats stats={stats} />
+        
+        {/* Performance Chart */}
+        <PerformanceChart data={performanceData} />
+        
   
         {/* Interview Grid */}
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">

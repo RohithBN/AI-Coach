@@ -57,17 +57,15 @@ If the conversation is too short or lacks substantial content, use lower ratings
       `.trim()
     });
 
-    // Parse and validate feedback
     let parsedFeedback;
+    let overallScore = 1; // Default score
+
     try {
       // Remove any code block markers and extra whitespace
       const cleanFeedback = feedback
         .replace(/```(json)?/g, '')
         .replace(/^\s+|\s+$/g, '')
         .trim();
-
-      console.log("Raw Feedback:", feedback);
-      console.log("Clean Feedback:", cleanFeedback);
 
       // Attempt to parse the feedback
       parsedFeedback = JSON.parse(cleanFeedback);
@@ -79,6 +77,10 @@ If the conversation is too short or lacks substantial content, use lower ratings
           !parsedFeedback.overall) {
         throw new Error('Invalid feedback structure');
       }
+      
+      // Set overall score from parsed feedback
+      overallScore = parsedFeedback.overall.score || 1;
+
     } catch (parseError) {
       console.error("Failed to parse feedback:", { 
         feedback, 
@@ -104,8 +106,11 @@ If the conversation is too short or lacks substantial content, use lower ratings
           recommendations: ["Please review the interview details manually"]
         }
       };
+      overallScore = 1; // Set default score on error
     }
 
+
+   
     // Save to database
     try {
       const feedbackRef = adminDb.collection('feedback').doc();
@@ -132,14 +137,16 @@ If the conversation is too short or lacks substantial content, use lower ratings
           feedback: feedbackToSave,
           interviewId,
           userId,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
+          overallScore
         });
 
         // Update interview
         transaction.update(interviewRef, {
           hasFeedback: true,
           feedbackId: feedbackRef.id,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          overallScore
         });
       });
 

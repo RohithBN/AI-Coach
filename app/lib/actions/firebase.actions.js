@@ -29,6 +29,9 @@ export const getInterviews = async (userId) => {
           level: data.level || "Unknown",
           techstack: Array.isArray(data.techstack) ? data.techstack : [],
           questionSize: Array.isArray(data.questions) ? data.questions.length : 0,
+          updatedAt: data.updatedAt || null,
+          overallScore:data.overallScore||null,
+          hasFeedback:data.hasFeedback||false,
         };
       })
       .sort((a, b) => b.createdAt - a.createdAt); // Sort manually
